@@ -9,6 +9,7 @@ import {
   Alert,
 } from "react-native";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
@@ -22,11 +23,15 @@ export default function Login({ navigation }) {
       });
       const { role, name } = response.data; // Assuming user data comes with 'role' and 'name'
 
-      // Passing the user data to the respective dashboard
+      // Save user session
+      const userData = { name, role, email };
+      await AsyncStorage.setItem("userSession", JSON.stringify(userData));
+
+      // Navigate to the dashboard based on user role
       if (role === "teacher") {
-        navigation.navigate("TeacherDashboard", { user: { name, role } });
+        navigation.navigate("TeacherDashboard", { user: userData });
       } else {
-        navigation.navigate("StudentDashboard", { user: { name, role } });
+        navigation.navigate("StudentDashboard", { user: userData });
       }
     } catch (error) {
       Alert.alert("Error", error.response?.data || "Invalid login credentials");

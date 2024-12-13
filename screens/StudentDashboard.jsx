@@ -1,15 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Button, ScrollView } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function StudentDashboard({ route }) {
-  const { user } = route.params; // Destructure user from route.params
+export default function StudentDashboard({ route, navigation }) {
+  const [user, setUser] = useState(null);
   const courses = [
-    { name: "Math 101", description: "Introduction to Math" },
+    { name: "Math 10111", description: "Introduction to Math" },
     { name: "Science 102", description: "Basic Science" },
     { name: "History 101", description: "World History" },
   ];
 
-  // Ensure that the user object exists before accessing its properties
+  useEffect(() => {
+    const loadSession = async () => {
+      const sessionData = await AsyncStorage.getItem("userSession");
+      if (sessionData) {
+        setUser(JSON.parse(sessionData));
+      } else {
+        navigation.navigate("Login");
+      }
+    };
+    loadSession();
+  }, []);
+
   if (!user) {
     return (
       <View style={styles.container}>
