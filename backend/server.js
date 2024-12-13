@@ -9,11 +9,8 @@ app.use(express.json());
 
 // Connect to MySQL
 const db = mysql.createConnection({
-  host: "ed-tech-anuj211358-a952.i.aivencloud.com",
-  user: "avnadmin",
-  password: "AVNS_0vdtStG_pI8P_SCLS23",
-  database: "defaultdb",
-  port: 22278,
+//write your cred 
+//make free mysql at https://aiven.io/
 });
 
 db.connect((err) => {
