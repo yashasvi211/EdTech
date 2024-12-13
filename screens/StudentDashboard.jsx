@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Button, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Button, Card, Title, Paragraph } from "react-native-paper"; // Material UI Components
 
 export default function StudentDashboard({ route, navigation }) {
   const [user, setUser] = useState(null);
@@ -8,6 +9,9 @@ export default function StudentDashboard({ route, navigation }) {
     { name: "Math 10111", description: "Introduction to Math" },
     { name: "Science 102", description: "Basic Science" },
     { name: "History 101", description: "World History" },
+    { name: "History 102", description: "Advanced History" },
+    { name: "Geography 101", description: "Introduction to Geography" },
+    { name: "Computer Science 101", description: "Intro to CS" },
   ];
 
   useEffect(() => {
@@ -32,19 +36,26 @@ export default function StudentDashboard({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome, {user.name}!</Text>
-      <Text style={styles.subtitle}>Your Enrolled Courses</Text>
-      <ScrollView style={styles.courseList}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.title}>Welcome, {user.name}!</Text>
+        <Text style={styles.subtitle}>Your Enrolled Courses</Text>
         {courses.map((course, index) => (
-          <View key={index} style={styles.courseCard}>
-            <Text style={styles.courseName}>{course.name}</Text>
-            <Text style={styles.courseDescription}>{course.description}</Text>
-            <Button title="View Assignments" onPress={() => {}} />
-          </View>
+          <Card key={index} style={styles.courseCard}>
+            <Card.Content>
+              <Title>{course.name}</Title>
+              <Paragraph>{course.description}</Paragraph>
+            </Card.Content>
+            <Card.Actions>
+              <Button mode="contained" onPress={() => {}}>
+                View Assignments
+              </Button>
+            </Card.Actions>
+          </Card>
         ))}
       </ScrollView>
-      <Button title="View Completed Tasks" onPress={() => {}} color="#4CAF50" />
-      <Button title="View Notifications" onPress={() => {}} color="#4CAF50" />
     </View>
   );
 }
@@ -52,9 +63,11 @@ export default function StudentDashboard({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    padding: 20,
     backgroundColor: "#f4f4f9",
+  },
+  scrollContainer: {
+    padding: 20,
+    paddingBottom: 100, // Extra space to avoid content being cut off at the bottom
   },
   title: {
     fontSize: 32,
@@ -67,23 +80,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontWeight: "bold",
   },
-  courseList: {
+  courseCard: {
     marginBottom: 20,
   },
-  courseCard: {
-    padding: 10,
-    marginBottom: 10,
-    backgroundColor: "#fff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  courseName: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  courseDescription: {
-    fontSize: 16,
-    color: "#555",
+  button: {
+    marginTop: 10,
   },
 });
