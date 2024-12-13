@@ -25,10 +25,14 @@ export default function SignUp({ navigation }) {
         role,
       });
       Alert.alert("Success", response.data);
-      navigation.navigate("Login"); // After sign-up, navigate to Login
+      navigation.navigate("Login");
     } catch (error) {
-      console.error("Error in signup: ", error); // Log full error for debugging
-      Alert.alert("Error", error.response?.data || "Something went wrong");
+      if (error.response?.status === 409) {
+        Alert.alert("Error", "Email is already taken");
+      } else {
+        console.error("Error in signup: ", error); // Log full error for debugging
+        Alert.alert("Error", error.response?.data || "Something went wrong");
+      }
     }
   };
 

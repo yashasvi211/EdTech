@@ -1,17 +1,48 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  BackHandler,
+  Alert,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Button, Card, Title, Paragraph } from "react-native-paper"; // Material UI Components
+import { Button, Card, Title, Paragraph } from "react-native-paper";
 
 export default function StudentDashboard({ route, navigation }) {
   const [user, setUser] = useState(null);
   const courses = [
-    { name: "Math 10111", description: "Introduction to Math" },
-    { name: "Science 102", description: "Basic Science" },
-    { name: "History 101", description: "World History" },
-    { name: "History 102", description: "Advanced History" },
-    { name: "Geography 101", description: "Introduction to Geography" },
-    { name: "Computer Science 101", description: "Intro to CS" },
+    {
+      name: "Math 101",
+      description: "Introduction to Math",
+      syllabus: "Math syllabus content...",
+    },
+    {
+      name: "Science 102",
+      description: "Basic Science",
+      syllabus: "Science syllabus content...",
+    },
+    {
+      name: "History 101",
+      description: "World History",
+      syllabus: "History syllabus content...",
+    },
+    {
+      name: "History 102",
+      description: "Advanced History",
+      syllabus: "Advanced History syllabus content...",
+    },
+    {
+      name: "Geography 101",
+      description: "Introduction to Geography",
+      syllabus: "Geography syllabus content...",
+    },
+    {
+      name: "Computer Science 101",
+      description: "Intro to CS",
+      syllabus: "CS syllabus content...",
+    },
   ];
 
   useEffect(() => {
@@ -23,8 +54,40 @@ export default function StudentDashboard({ route, navigation }) {
         navigation.navigate("Login");
       }
     };
+
+    const backAction = () => {
+      if (navigation.isFocused()) {
+        Alert.alert("Hold on!", "Are you sure you want to exit the app?", [
+          {
+            text: "Cancel",
+            onPress: () => null,
+            style: "cancel",
+          },
+          { text: "YES", onPress: () => BackHandler.exitApp() },
+        ]);
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
     loadSession();
-  }, []);
+
+    return () => backHandler.remove(); // Cleanup
+  }, [navigation]);
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("userSession");
+    navigation.replace("Login"); // Replace stack to prevent back navigation
+  };
+
+  const viewSyllabus = (syllabus) => {
+    Alert.alert("Syllabus", syllabus);
+  };
 
   if (!user) {
     return (
@@ -52,6 +115,13 @@ export default function StudentDashboard({ route, navigation }) {
               <Button mode="contained" onPress={() => {}}>
                 View Assignments
               </Button>
+              <Button
+                mode="outlined"
+                onPress={() => viewSyllabus(course.syllabus)}
+                style={styles.syllabusButton}
+              >
+                View Syllabus
+              </Button>
             </Card.Actions>
           </Card>
         ))}
@@ -67,7 +137,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 20,
-    paddingBottom: 100, // Extra space to avoid content being cut off at the bottom
+    paddingBottom: 100,
   },
   title: {
     fontSize: 32,
@@ -83,7 +153,11 @@ const styles = StyleSheet.create({
   courseCard: {
     marginBottom: 20,
   },
-  button: {
-    marginTop: 10,
+  syllabusButton: {
+    marginLeft: 10,
+  },
+  logoutButton: {
+    marginTop: 20,
+    backgroundColor: "#FF5252",
   },
 });
