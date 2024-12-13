@@ -16,15 +16,17 @@ export default function Login({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:3000/login", {
+      const response = await axios.post("http://192.168.29.144:3000/login", {
         email,
         password,
       });
-      const { role } = response.data;
+      const { role, name } = response.data; // Assuming user data comes with 'role' and 'name'
+
+      // Passing the user data to the respective dashboard
       if (role === "teacher") {
-        navigation.navigate("TeacherDashboard");
+        navigation.navigate("TeacherDashboard", { user: { name, role } });
       } else {
-        navigation.navigate("StudentDashboard");
+        navigation.navigate("StudentDashboard", { user: { name, role } });
       }
     } catch (error) {
       Alert.alert("Error", error.response?.data || "Invalid login credentials");
