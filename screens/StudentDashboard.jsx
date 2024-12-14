@@ -6,68 +6,59 @@ import {
   ScrollView,
   BackHandler,
   Alert,
+  Linking,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Button, Card, Title, Paragraph } from "react-native-paper";
+import axios from "axios"; // Import axios
 
 export default function StudentDashboard({ route, navigation }) {
   const [user, setUser] = useState(null);
-  const courses = [
-    {
-      name: "Math 101",
-      description: "Introduction to Math",
-      syllabus: "Math syllabus content...",
-    },
-    {
-      name: "Science 102",
-      description: "Basic Science",
-      syllabus: "Science syllabus content...",
-    },
-    {
-      name: "History 101",
-      description: "World History",
-      syllabus: "History syllabus content...",
-    },
-    {
-      name: "History 102",
-      description: "Advanced History",
-      syllabus: "Advanced History syllabus content...",
-    },
-    {
-      name: "Geography 101",
-      description: "Introduction to Geography",
-      syllabus: "Geography syllabus content...",
-    },
-    {
-      name: "Computer Science 101",
-      description: "Intro to CS",
-      syllabus: "CS syllabus content...",
-    },
-  ];
+  const [courses, setCourses] = useState([]); // State to hold courses data
 
   useEffect(() => {
+    // Load session data
     const loadSession = async () => {
-      const sessionData = await AsyncStorage.getItem("userSession");
-      if (sessionData) {
-        setUser(JSON.parse(sessionData));
-      } else {
-        navigation.navigate("Login");
+      try {
+        const sessionData = await AsyncStorage.getItem("userSession");
+        console.log("Retrieved session data:", sessionData); // Debug log
+        if (sessionData) {
+          const parsedData = JSON.parse(sessionData);
+          setUser(parsedData); // Set user data if found
+          await AsyncStorage.setItem(
+            "studentId",
+            JSON.stringify(parsedData.id)
+          ); // Save studentId
+        } else {
+          navigation.navigate("SignIn"); // Navigate to SignIn if no session
+        }
+      } catch (error) {
+        console.error("Error loading session:", error); // Log error
+        Alert.alert("Error", "Failed to load session data.");
       }
     };
 
+    // Fetch courses from API
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get("http://192.168.29.144:3000/courses"); // Replace with your API URL
+        setCourses(response.data); // Update courses state
+      } catch (error) {
+        console.error("Error fetching courses:", error); // Log error
+        Alert.alert("Error", "Failed to load courses.");
+      }
+    };
+
+    // Back handler for Android hardware back press
     const backAction = () => {
       if (navigation.isFocused()) {
         Alert.alert("Hold on!", "Are you sure you want to exit the app?", [
-          {
-            text: "Cancel",
-            onPress: () => null,
-            style: "cancel",
-          },
+          { text: "Cancel", onPress: () => null, style: "cancel" },
           { text: "YES", onPress: () => BackHandler.exitApp() },
         ]);
-        return true;
+        return true; // Prevent default behavior
       }
-      return false;
+      return false; // Allow default behavior
     };
 
     const backHandler = BackHandler.addEventListener(
@@ -75,20 +66,36 @@ export default function StudentDashboard({ route, navigation }) {
       backAction
     );
 
-    loadSession();
+    loadSession(); // Load session on component mount
+    fetchCourses(); // Fetch courses on component mount
 
-    return () => backHandler.remove(); // Cleanup
+    return () => backHandler.remove(); // Cleanup back handler on unmount
   }, [navigation]);
 
+  // Handle logout and clear session
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("userSession");
-    navigation.replace("Login"); // Replace stack to prevent back navigation
+    try {
+      await AsyncStorage.removeItem("userSession"); // Remove session data
+      navigation.replace("SignIn"); // Replace stack to prevent back navigation
+    } catch (error) {
+      console.error("Error during logout:", error); // Log error
+      Alert.alert("Error", "Failed to log out.");
+    }
   };
 
+  // Handle syllabus link opening
   const viewSyllabus = (syllabus) => {
-    Alert.alert("Syllabus", syllabus);
+    // Open the syllabus link (PDF or URL)
+    Linking.openURL(syllabus);
   };
 
+  // Navigate to the Assignments screen
+  const viewAssignments = (courseId) => {
+    // Navigate to the Assignments screen and pass courseId
+    navigation.navigate("Assignments", { courseId });
+  };
+
+  // If user is not found, display a message
   if (!user) {
     return (
       <View style={styles.container}>
@@ -112,7 +119,10 @@ export default function StudentDashboard({ route, navigation }) {
               <Paragraph>{course.description}</Paragraph>
             </Card.Content>
             <Card.Actions>
-              <Button mode="contained" onPress={() => {}}>
+              <Button
+                mode="contained"
+                onPress={() => viewAssignments(course.id)} // Pass course ID to the next screen
+              >
                 View Assignments
               </Button>
               <Button
@@ -155,9 +165,5 @@ const styles = StyleSheet.create({
   },
   syllabusButton: {
     marginLeft: 10,
-  },
-  logoutButton: {
-    marginTop: 20,
-    backgroundColor: "#FF5252",
   },
 });

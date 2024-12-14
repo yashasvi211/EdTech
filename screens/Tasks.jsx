@@ -141,6 +141,8 @@ export default function Tasks() {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Tasks</Text>
+
       {/* Show My Tasks by default */}
       {activeSection === "my" && (
         <>

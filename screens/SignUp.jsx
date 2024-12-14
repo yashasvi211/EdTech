@@ -25,7 +25,7 @@ export default function SignUp({ navigation }) {
         role,
       });
       Alert.alert("Success", response.data);
-      navigation.navigate("Login");
+      navigation.navigate("SignIn");
     } catch (error) {
       if (error.response?.status === 409) {
         Alert.alert("Error", "Email is already taken");

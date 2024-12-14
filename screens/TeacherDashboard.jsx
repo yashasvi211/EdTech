@@ -1,42 +1,179 @@
-import React from "react";
-import { View, Text, StyleSheet, Button, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  BackHandler,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Button } from "react-native-paper";
+import { PieChart } from "react-native-chart-kit";
+import { Dimensions } from "react-native";
 
-export default function TeacherDashboard() {
-  const courses = [
-    { name: "Math 101", description: "Introduction to Math" },
-    { name: "Science 102", description: "Basic Science" },
-    { name: "History 101", description: "World History" },
-  ];
+const screenWidth = Dimensions.get("window").width;
+
+export default function TeacherDashboard({ navigation }) {
+  const [user, setUser] = useState(null);
+  const [submissionData, setSubmissionData] = useState({
+    submitted: 0,
+    notSubmitted: 0,
+  });
+
+  useEffect(() => {
+    const loadSession = async () => {
+      const sessionData = await AsyncStorage.getItem("userSession");
+      if (sessionData) {
+        setUser(JSON.parse(sessionData));
+      } else {
+        navigation.navigate("Login");
+      }
+    };
+
+    const fetchSubmissionData = async () => {
+      try {
+        const response = await fetch(
+          "http://192.168.29.144:3000/assignment_submissions"
+        );
+        const data = await response.json();
+
+        const submittedCount = data.filter(
+          (record) => record.submitted_at !== null
+        ).length;
+        const totalSubmissionsExpected = data.length;
+
+        setSubmissionData({
+          submitted: submittedCount,
+          notSubmitted: totalSubmissionsExpected - submittedCount,
+        });
+      } catch (error) {
+        console.error("Error fetching submission data:", error);
+      }
+    };
+
+    const backAction = () => {
+      if (navigation.isFocused()) {
+        Alert.alert("Hold on!", "Are you sure you want to exit the app?", [
+          { text: "Cancel", onPress: () => null, style: "cancel" },
+          { text: "YES", onPress: () => BackHandler.exitApp() },
+        ]);
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    loadSession();
+    fetchSubmissionData();
+
+    return () => backHandler.remove();
+  }, [navigation]);
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("userSession");
+    navigation.replace("Login");
+  };
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>User not found</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome, Teacher!</Text>
-      <Text style={styles.subtitle}>Your Courses</Text>
-      <ScrollView style={styles.courseList}>
-        {courses.map((course, index) => (
-          <View key={index} style={styles.courseCard}>
-            <Text style={styles.courseName}>{course.name}</Text>
-            <Text style={styles.courseDescription}>{course.description}</Text>
-            <Button title="Manage Students" onPress={() => {}} />
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.title}>Welcome, {user.name}!</Text>
+        <Text style={styles.subtitle}>Dashboard Overview</Text>
+
+        {/* Submission Status Chart */}
+        <View style={styles.chartContainer}>
+          <Text style={styles.chartTitle}>Submission Status</Text>
+          <PieChart
+            data={[
+              {
+                name: "Submitted",
+                population: submissionData.submitted,
+                color: "green",
+                legendFontColor: "#7F7F7F",
+                legendFontSize: 15,
+              },
+              {
+                name: "Not Submitted",
+                population: submissionData.notSubmitted,
+                color: "red",
+                legendFontColor: "#7F7F7F",
+                legendFontSize: 15,
+              },
+            ]}
+            width={screenWidth - 40}
+            height={200}
+            chartConfig={chartConfig}
+            accessor={"population"}
+            backgroundColor={"transparent"}
+            paddingLeft={"15"}
+          />
+        </View>
+
+        {/* Management Options */}
+        <Text style={styles.subtitle}>Manage</Text>
+        <View style={styles.managementContainer}>
+          <View style={styles.row}>
+            <Button
+              mode="contained"
+              style={styles.managementBox}
+              onPress={() => navigation.navigate("ManageStudents")}
+            >
+              Manage Students
+            </Button>
+            <Button
+              mode="contained"
+              style={styles.managementBox}
+              onPress={() => navigation.navigate("ManageCourses")}
+            >
+              Manage Courses
+            </Button>
           </View>
-        ))}
+          <View style={styles.row}>
+            <Button
+              mode="contained"
+              style={styles.managementBox}
+              onPress={() => navigation.navigate("ManageAssignments")}
+            >
+              Manage Assignments
+            </Button>
+          </View>
+        </View>
       </ScrollView>
-      <Button title="Create Post" onPress={() => {}} color="#4CAF50" />
-      <Button
-        title="View Course Statistics"
-        onPress={() => {}}
-        color="#4CAF50"
-      />
     </View>
   );
 }
 
+const chartConfig = {
+  backgroundGradientFrom: "#ffffff",
+  backgroundGradientTo: "#ffffff",
+  color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
+  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    padding: 20,
     backgroundColor: "#f4f4f9",
+  },
+  scrollContainer: {
+    padding: 20,
+    paddingBottom: 100,
   },
   title: {
     fontSize: 32,
@@ -49,23 +186,29 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontWeight: "bold",
   },
-  courseList: {
+  chartContainer: {
     marginBottom: 20,
   },
-  courseCard: {
-    padding: 10,
+  chartTitle: {
+    fontSize: 20,
     marginBottom: 10,
-    backgroundColor: "#fff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  courseName: {
-    fontSize: 18,
+    textAlign: "center",
     fontWeight: "bold",
   },
-  courseDescription: {
-    fontSize: 16,
-    color: "#555",
+  managementContainer: {
+    marginBottom: 20,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  managementBox: {
+    flex: 1,
+    margin: 5,
+    justifyContent: "center",
+    height: 100,
+    borderRadius: 10,
+    backgroundColor: "#6200ee",
   },
 });

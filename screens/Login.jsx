@@ -21,10 +21,10 @@ export default function Login({ navigation }) {
         email,
         password,
       });
-      const { role, name } = response.data; // Assuming user data comes with 'role' and 'name'
+      const { id, role, name } = response.data; // Assuming user data comes with 'id', 'role', and 'name'
 
       // Save user session
-      const userData = { name, role, email };
+      const userData = { id, name, role, email };
       await AsyncStorage.setItem("userSession", JSON.stringify(userData));
 
       // Navigate to the dashboard based on user role

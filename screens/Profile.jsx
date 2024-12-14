@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Profile({ navigation }) {
   const handleLogout = async () => {
     await AsyncStorage.removeItem("userSession"); // Clear the stored session
-    navigation.navigate("Login"); // Redirect to login page after logout
+    navigation.navigate("SignIn"); // Redirect to login page after logout
   };
 
   return (

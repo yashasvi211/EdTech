@@ -1,23 +1,22 @@
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "react-native-vector-icons";
 
-// Import your screens
 import Login from "./screens/Login";
 import SignUp from "./screens/SignUp";
 import StudentDashboard from "./screens/StudentDashboard";
 import TeacherDashboard from "./screens/TeacherDashboard";
-import Profile from "./screens/Profile"; // Import the Profile screen
-import Notifications from "./screens/Notifications"; // Import the Notifications screen
-import Tasks from "./screens/Tasks"; // Import the Tasks screen
-
-// Import icons
-import { Ionicons } from "react-native-vector-icons";
+import Profile from "./screens/Profile";
+import Notifications from "./screens/Notifications";
+import Tasks from "./screens/Tasks";
+import Assignments from "./screens/Assignments";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// Define StudentTabs for the student dashboard
 function StudentTabs() {
   return (
     <Tab.Navigator
@@ -70,17 +69,27 @@ function StudentTabs() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={Login} />
+      <Stack.Navigator initialRouteName="SignIn">
+        {/* SignIn Screen */}
+        <Stack.Screen name="SignIn" component={Login} />
+
+        {/* SignUp Screen */}
         <Stack.Screen name="SignUp" component={SignUp} />
+
+        {/* StudentDashboard Screen with Tab navigation */}
         <Stack.Screen
           name="StudentDashboard"
           component={StudentTabs} // Use Tab navigation for student dashboard
           options={{
-            headerShown: false, // Hide header completely
+            headerShown: false, // Hide header completely for StudentDashboard
           }}
         />
+
+        {/* TeacherDashboard Screen */}
         <Stack.Screen name="TeacherDashboard" component={TeacherDashboard} />
+
+        {/* Assignments Screen */}
+        <Stack.Screen name="Assignments" component={Assignments} />
       </Stack.Navigator>
     </NavigationContainer>
   );
