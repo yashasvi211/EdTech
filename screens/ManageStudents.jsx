@@ -24,7 +24,9 @@ export default function ManageStudents() {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await fetch("http://192.168.29.144:3000/students");
+        const response = await fetch(
+          "https://edtech-server-3dnc.onrender.com/students"
+        );
         const data = await response.json();
         setStudents(data);
       } catch (error) {
@@ -40,7 +42,7 @@ export default function ManageStudents() {
   const fetchStudentAssignments = async (studentId) => {
     try {
       const response = await fetch(
-        `http://192.168.29.144:3000/student-assignments/${studentId}`
+        `https://edtech-server-3dnc.onrender.com/student-assignments/${studentId}`
       );
       const data = await response.json();
       setStudentAssignments(data);

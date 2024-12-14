@@ -21,7 +21,9 @@ const ManageAssignments = () => {
   useEffect(() => {
     const fetchAssignments = async () => {
       try {
-        const response = await fetch("http://192.168.29.144:3000/assignments");
+        const response = await fetch(
+          "https://edtech-server-3dnc.onrender.com/assignments"
+        );
         const data = await response.json();
         setAssignments(data);
       } catch (error) {
@@ -30,7 +32,9 @@ const ManageAssignments = () => {
     };
     const fetchCourses = async () => {
       try {
-        const response = await fetch("http://192.168.29.144:3000/courses");
+        const response = await fetch(
+          "https://edtech-server-3dnc.onrender.com/courses"
+        );
         const data = await response.json();
         setCourses(data);
       } catch (error) {
@@ -55,13 +59,16 @@ const ManageAssignments = () => {
     };
 
     try {
-      const response = await fetch("http://192.168.29.144:3000/assignments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newAssignment),
-      });
+      const response = await fetch(
+        "https://edtech-server-3dnc.onrender.com/assignments",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newAssignment),
+        }
+      );
 
       if (response.ok) {
         const addedAssignment = await response.json();

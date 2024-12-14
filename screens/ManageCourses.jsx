@@ -18,7 +18,9 @@ export default function ManageCourses() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch("http://192.168.29.144:3000/courses");
+        const response = await fetch(
+          "https://edtech-server-3dnc.onrender.com/courses"
+        );
         const data = await response.json();
         setCourses(data);
       } catch (error) {
@@ -41,13 +43,16 @@ export default function ManageCourses() {
     };
 
     try {
-      const response = await fetch("http://192.168.29.144:3000/courses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newCourse),
-      });
+      const response = await fetch(
+        "https://edtech-server-3dnc.onrender.com/courses",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newCourse),
+        }
+      );
 
       if (response.ok) {
         const addedCourse = await response.json();

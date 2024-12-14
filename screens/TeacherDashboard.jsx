@@ -34,7 +34,7 @@ export default function TeacherDashboard({ navigation }) {
     const fetchSubmissionData = async () => {
       try {
         const response = await fetch(
-          "http://192.168.29.144:3000/assignment_submissions"
+          "https://edtech-server-3dnc.onrender.com/assignment_submissions"
         );
         const data = await response.json();
 

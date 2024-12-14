@@ -44,7 +44,7 @@ const Assignments = ({ route }) => {
 
           setIsLoading(true);
           const response = await axios.get(
-            `http://192.168.29.144:3000/assignmentsMain/${courseId}`,
+            `https://edtech-server-3dnc.onrender.com/assignmentsMain/${courseId}`,
             {
               params: { studentId: parsedStudentId },
             }
@@ -75,7 +75,7 @@ const Assignments = ({ route }) => {
 
     try {
       const response = await axios.post(
-        "http://192.168.29.144:3000/submit-assignment",
+        "https://edtech-server-3dnc.onrender.com/submit-assignment",
         {
           assignment_id: selectedAssignment.id,
           student_id: studentId,

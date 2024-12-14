@@ -41,7 +41,9 @@ export default function StudentDashboard({ route, navigation }) {
     // Fetch courses from API
     const fetchCourses = async () => {
       try {
-        const response = await axios.get("http://192.168.29.144:3000/courses"); // Replace with your API URL
+        const response = await axios.get(
+          "https://edtech-server-3dnc.onrender.com/courses"
+        ); // Replace with your API URL
         setCourses(response.data); // Update courses state
       } catch (error) {
         console.error("Error fetching courses:", error); // Log error

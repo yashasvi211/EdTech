@@ -17,10 +17,13 @@ export default function Login({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://192.168.29.144:3000/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "https://edtech-server-3dnc.onrender.com/login",
+        {
+          email,
+          password,
+        }
+      );
       const { id, role, name } = response.data; // Assuming user data comes with 'id', 'role', and 'name'
 
       // Save user session

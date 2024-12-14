@@ -18,12 +18,15 @@ export default function SignUp({ navigation }) {
 
   const handleSignUp = async () => {
     try {
-      const response = await axios.post("http://192.168.29.144:3000/signup", {
-        name,
-        email,
-        password,
-        role,
-      });
+      const response = await axios.post(
+        "https://edtech-server-3dnc.onrender.com/signup",
+        {
+          name,
+          email,
+          password,
+          role,
+        }
+      );
       Alert.alert("Success", response.data);
       navigation.navigate("SignIn");
     } catch (error) {
