@@ -164,13 +164,6 @@ export default function TeacherDashboard({ navigation }) {
             >
               Assignments
             </Button>
-            <Button
-              mode="contained"
-              style={styles.managementBox}
-              onPress={() => navigation.navigate("Tasks")}
-            >
-              Tasks
-            </Button>
           </View>
         </View>
       </ScrollView>

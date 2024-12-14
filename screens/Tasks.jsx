@@ -15,13 +15,76 @@ export default function Tasks() {
   const [activeSection, setActiveSection] = useState("my");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Fetch tasks from the API
+  // Mock data for tasks
+  const mockTasks = [
+    {
+      id: "1",
+      name: "Math Homework",
+      deadline: "2024-12-20T00:00:00Z",
+      completed: false,
+    },
+    {
+      id: "2",
+      name: "Science Project",
+      deadline: "2024-12-18T00:00:00Z",
+      completed: false,
+    },
+    {
+      id: "3",
+      name: "English Essay",
+      deadline: "2024-12-15T00:00:00Z",
+      completed: true,
+    },
+    {
+      id: "4",
+      name: "History Assignment",
+      deadline: "2024-12-10T00:00:00Z",
+      completed: true,
+    },
+    {
+      id: "5",
+      name: "Computer Science Lab Report",
+      deadline: "2024-12-25T00:00:00Z",
+      completed: false,
+    },
+    {
+      id: "6",
+      name: "Art Project",
+      deadline: "2024-12-16T00:00:00Z",
+      completed: false,
+    },
+    {
+      id: "7",
+      name: "Geography Assignment",
+      deadline: "2024-12-12T00:00:00Z",
+      completed: false,
+    },
+    {
+      id: "8",
+      name: "Literature Review",
+      deadline: "2024-12-21T00:00:00Z",
+      completed: false,
+    },
+    {
+      id: "9",
+      name: "Chemistry Experiment Report",
+      deadline: "2024-12-22T00:00:00Z",
+      completed: true,
+    },
+    {
+      id: "10",
+      name: "Physics Assignment",
+      deadline: "2024-12-14T00:00:00Z",
+      completed: true,
+    },
+  ];
+
+  // Fetch tasks (mocked)
   const fetchTasks = async () => {
     setIsRefreshing(true); // Set refreshing state to true
     try {
-      const response = await fetch("http://192.168.29.144:3000/tasks");
-      const data = await response.json();
-      setTasks(Array.isArray(data) ? data : []);
+      // Here we just set the mock data
+      setTasks(mockTasks);
     } catch (err) {
       console.error("Error fetching tasks:", err);
       setTasks([]); // Default to empty array on error
@@ -32,59 +95,25 @@ export default function Tasks() {
   };
 
   useEffect(() => {
-    fetchTasks();
+    fetchTasks(); // Call fetch tasks on component mount
   }, []);
 
   const markAsCompleted = async (id) => {
-    try {
-      const response = await fetch(`http://192.168.29.144:3000/tasks/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ completed: true }),
-      });
-
-      if (response.ok) {
-        setTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task.id === id ? { ...task, completed: true } : task
-          )
-        );
-        Alert.alert("Success", "Task marked as completed!");
-      } else {
-        Alert.alert("Error", "Failed to mark task as completed");
-      }
-    } catch (err) {
-      console.error("Error updating task status:", err);
-      Alert.alert("Error", "Unable to update task status.");
-    }
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === id ? { ...task, completed: true } : task
+      )
+    );
+    Alert.alert("Success", "Task marked as completed!");
   };
 
   const markAsUndone = async (id) => {
-    try {
-      const response = await fetch(`http://192.168.29.144:3000/tasks/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ completed: false }),
-      });
-
-      if (response.ok) {
-        setTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task.id === id ? { ...task, completed: false } : task
-          )
-        );
-        Alert.alert("Success", "Task marked as undone!");
-      } else {
-        Alert.alert("Error", "Failed to mark task as undone");
-      }
-    } catch (err) {
-      console.error("Error updating task status:", err);
-      Alert.alert("Error", "Unable to update task status.");
-    }
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === id ? { ...task, completed: false } : task
+      )
+    );
+    Alert.alert("Success", "Task marked as undone!");
   };
 
   const renderTask = (task) => {

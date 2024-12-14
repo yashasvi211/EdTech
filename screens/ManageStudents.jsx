@@ -7,7 +7,13 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Modal,
+  ScrollView,
 } from "react-native";
+import {
+  Button as PaperButton,
+  Card,
+  TextInput as PaperInput,
+} from "react-native-paper";
 
 export default function ManageStudents() {
   const [students, setStudents] = useState([]);
@@ -16,7 +22,6 @@ export default function ManageStudents() {
   const [studentAssignments, setStudentAssignments] = useState(null);
 
   useEffect(() => {
-    // Fetch student data from the API
     const fetchStudents = async () => {
       try {
         const response = await fetch("http://192.168.29.144:3000/students");
@@ -74,12 +79,13 @@ export default function ManageStudents() {
             <Text style={styles.assignmentSummary}>
               Pending Assignments: {studentAssignments.pendingAssignments}
             </Text>
-            <TouchableOpacity
-              style={styles.closeButton}
+            <PaperButton
+              mode="contained"
               onPress={() => setSelectedStudent(null)}
+              style={styles.closeButton}
             >
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
+              Close
+            </PaperButton>
           </View>
         </View>
       </Modal>
@@ -100,18 +106,19 @@ export default function ManageStudents() {
       {students.length === 0 ? (
         <Text style={styles.noDataText}>No students found</Text>
       ) : (
-        <FlatList
-          data={students}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+          {students.map((student) => (
             <TouchableOpacity
+              key={student.id}
               style={styles.studentItem}
-              onPress={() => handleStudentPress(item)}
+              onPress={() => handleStudentPress(student)}
             >
-              <Text style={styles.studentName}>{item.name}</Text>
+              <Card style={styles.card}>
+                <Text style={styles.studentName}>{student.name}</Text>
+              </Card>
             </TouchableOpacity>
-          )}
-        />
+          ))}
+        </ScrollView>
       )}
       {renderStudentAssignmentModal()}
     </View>
@@ -174,12 +181,13 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     marginTop: 15,
-    backgroundColor: "#6200ee",
-    padding: 10,
-    borderRadius: 5,
   },
-  closeButtonText: {
-    color: "white",
-    fontWeight: "bold",
+  scrollViewContent: {
+    paddingBottom: 20,
+  },
+  card: {
+    padding: 15,
+    borderRadius: 5,
+    marginBottom: 10,
   },
 });

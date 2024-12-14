@@ -1,13 +1,26 @@
 const express = require("express");
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise"); // Import the promise version
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 const app = express();
 
-app.use(cors()); // Enable CORS for all origins
-app.use(express.json()); // Middleware for parsing JSON requests
+app.use(cors());
+app.use(express.json());
 
-const db = mysql.createConnection({
+// Create a connection pool instead of a single connection
+const pool = mysql.createPool({
+  host: "ed-tech-anuj211358-a952.i.aivencloud.com",
+  user: "avnadmin",
+  password: "AVNS_0vdtStG_pI8P_SCLS23",
+  database: "defaultdb",
+  port: 22278,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
+// Keep your existing db connection for non-promise queries if needed
+const db = require("mysql2").createConnection({
   host: "ed-tech-anuj211358-a952.i.aivencloud.com",
   user: "avnadmin",
   password: "AVNS_0vdtStG_pI8P_SCLS23",
@@ -15,6 +28,7 @@ const db = mysql.createConnection({
   port: 22278,
 });
 
+// Existing connection logic
 db.connect((err) => {
   if (err) {
     console.error("Database connection failed:", err);
@@ -22,6 +36,7 @@ db.connect((err) => {
     console.log("Connected to the database.");
   }
 });
+
 db.promise()
   .query("SELECT * FROM Users WHERE role = 'student'")
   .then(([rows, fields]) => {
@@ -351,7 +366,7 @@ app.get("/student-assignments/:studentId", async (req, res) => {
         ) AS assignmentDetails
     `;
 
-    // Execute the query
+    // Execute the query using the pool
     const [results] = await pool.execute(query, [
       studentId,
       studentId,
