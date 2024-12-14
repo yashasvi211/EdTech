@@ -8,25 +8,10 @@ app.use(cors());
 app.use(express.json());
 
 // Create a connection pool instead of a single connection
-const pool = mysql.createPool({
-  host: "ed-tech-anuj211358-a952.i.aivencloud.com",
-  user: "avnadmin",
-  password: "AVNS_0vdtStG_pI8P_SCLS23",
-  database: "defaultdb",
-  port: 22278,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+const pool = mysql.createPool({});
 
 // Keep your existing db connection for non-promise queries if needed
-const db = require("mysql2").createConnection({
-  host: "ed-tech-anuj211358-a952.i.aivencloud.com",
-  user: "avnadmin",
-  password: "AVNS_0vdtStG_pI8P_SCLS23",
-  database: "defaultdb",
-  port: 22278,
-});
+const db = require("mysql2").createConnection({});
 
 // Existing connection logic
 db.connect((err) => {
