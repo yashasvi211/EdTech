@@ -1,5 +1,3 @@
-// server.js (Express Backend)
-
 const express = require("express");
 const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
@@ -10,13 +8,7 @@ app.use(cors()); // Enable CORS for all origins
 app.use(express.json()); // Middleware for parsing JSON requests
 
 // Connect to MySQL
-const db = mysql.createConnection({
-  host: "ed-tech-anuj211358-a952.i.aivencloud.com",
-  user: "avnadmin",
-  password: "AVNS_0vdtStG_pI8P_SCLS23",
-  database: "defaultdb",
-  port: 22278,
-});
+const db = mysql.createConnection({});
 
 db.connect((err) => {
   if (err) {
@@ -25,6 +17,14 @@ db.connect((err) => {
     console.log("Connected to the database.");
   }
 });
+db.promise()
+  .query("SELECT * FROM Users WHERE role = 'student'")
+  .then(([rows, fields]) => {
+    console.log("Students:", rows);
+  })
+  .catch((err) => {
+    console.error("Error fetching students:", err);
+  });
 
 // Sign-Up Route
 app.post("/signup", async (req, res) => {
@@ -125,6 +125,8 @@ app.put("/tasks/:taskId", (req, res) => {
     res.json({ message: "Task status updated successfully" });
   });
 });
+
+// Courses Routes
 app.get("/courses", (req, res) => {
   db.query("SELECT * FROM courses", (err, results) => {
     if (err) {
@@ -134,10 +136,42 @@ app.get("/courses", (req, res) => {
     res.json(results);
   });
 });
-app.get("/assignments/:courseId", (req, res) => {
-  const { courseId } = req.params;
 
-  const query = `SELECT * FROM assignments WHERE course_id = ?`;
+// Update Course Route
+app.put("/courses/:courseId", (req, res) => {
+  const { courseId } = req.params;
+  const { name, description, syllabus } = req.body;
+
+  // Check if all required fields are present
+  if (!name || !description || !syllabus) {
+    return res.status(400).send("All fields are required");
+  }
+
+  const updateQuery = `
+    UPDATE courses
+    SET name = ?, description = ?, syllabus = ?
+    WHERE id = ?
+  `;
+
+  db.query(
+    updateQuery,
+    [name, description, syllabus, courseId],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: "Error updating course" });
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(404).send("Course not found");
+      }
+
+      res.json({ message: "Course updated successfully" });
+    }
+  );
+});
+app.get("/assignments/:courseId", (req, res) => {
+  const courseId = req.params.courseId;
+  const query = "SELECT * FROM assignments WHERE course_id = ?";
   db.query(query, [courseId], (err, results) => {
     if (err) {
       return res.status(500).send("Error fetching assignments");
@@ -145,42 +179,20 @@ app.get("/assignments/:courseId", (req, res) => {
     res.json(results);
   });
 });
-
 app.post("/submit-assignment", (req, res) => {
   const { assignment_id, student_id, file_link } = req.body;
 
-  const query =
+  const sql =
     "INSERT INTO assignment_submissions (assignment_id, student_id, file_link) VALUES (?, ?, ?)";
-  db.query(query, [assignment_id, student_id, file_link], (err, results) => {
+
+  db.query(sql, [assignment_id, student_id, file_link], (err, results) => {
     if (err) {
-      console.error("Database Error:", err); // Log the error
-      return res
-        .status(500)
-        .json({ message: "Error submitting assignment", error: err });
+      console.error("Error submitting assignment:", err); // Log the error
+      return res.status(500).send("Failed to submit assignment");
     }
-    res.json({ message: "Assignment submitted successfully" });
+    res.send({ message: "Assignment submitted successfully!" });
   });
 });
-app.get("/assignments/:courseId", (req, res) => {
-  const { courseId } = req.params;
-  const studentId = req.query.studentId; // Add student ID as a query parameter
-
-  const query = `
-    SELECT a.*, 
-    CASE WHEN s.id IS NOT NULL THEN 1 ELSE 0 END AS submitted
-    FROM assignments a
-    LEFT JOIN assignment_submissions s ON a.id = s.assignment_id AND s.student_id = ?
-    WHERE a.course_id = ?
-  `;
-
-  db.query(query, [studentId, courseId], (err, results) => {
-    if (err) {
-      return res.status(500).send("Error fetching assignments");
-    }
-    res.json(results);
-  });
-});
-
 app.get("/assignment_submissions", (req, res) => {
   const query = `
     SELECT 
@@ -205,6 +217,31 @@ app.get("/assignment_submissions", (req, res) => {
       return res.status(500).json({ message: "Error fetching submissions" });
     }
     res.json(results);
+  });
+});
+// Add Course Route
+app.post("/courses", (req, res) => {
+  const { name, description, syllabus } = req.body;
+
+  // Check if all required fields are present
+  if (!name || !description || !syllabus) {
+    return res.status(400).send("All fields are required");
+  }
+
+  const insertQuery = `
+    INSERT INTO courses (name, description, syllabus)
+    VALUES (?, ?, ?)
+  `;
+
+  db.query(insertQuery, [name, description, syllabus], (err, results) => {
+    if (err) {
+      console.error("Error adding course:", err);
+      return res.status(500).json({ error: "Error adding course" });
+    }
+
+    res
+      .status(201)
+      .json({ message: "Course added successfully", id: results.insertId });
   });
 });
 

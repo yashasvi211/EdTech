@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "react-native-vector-icons";
 
+// Import screens
 import Login from "./screens/Login";
 import SignUp from "./screens/SignUp";
 import StudentDashboard from "./screens/StudentDashboard";
@@ -12,6 +13,8 @@ import Profile from "./screens/Profile";
 import Notifications from "./screens/Notifications";
 import Tasks from "./screens/Tasks";
 import Assignments from "./screens/Assignments";
+import ManageStudents from "./screens/ManageStudents"; // Import the ManageStudents screen
+import ManageCourses from "./screens/ManageCourses"; // Import the ManageCourses screen
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -66,6 +69,38 @@ function StudentTabs() {
   );
 }
 
+// Define TeacherTabs for the teacher dashboard
+function TeacherTabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        tabBarStyle: {
+          backgroundColor: "#f4f4f9", // Custom background color for tabs
+        },
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={TeacherDashboard}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" color={color} size={size} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
+}
+
 export default function App() {
   return (
     <NavigationContainer>
@@ -85,8 +120,30 @@ export default function App() {
           }}
         />
 
-        {/* TeacherDashboard Screen */}
-        <Stack.Screen name="TeacherDashboard" component={TeacherDashboard} />
+        {/* TeacherDashboard Screen with Tab navigation */}
+        <Stack.Screen
+          name="TeacherDashboard"
+          component={TeacherTabs} // Use Tab navigation for teacher dashboard
+          options={{
+            headerShown: false, // Show the header for TeacherDashboard
+            headerBackVisible: false, // Remove back button from the header
+          }}
+        />
+
+        {/* Manage Students Screen */}
+        <Stack.Screen
+          name="ManageStudents"
+          component={ManageStudents} // Manage Students screen for teachers
+        />
+
+        {/* Manage Courses Screen */}
+        <Stack.Screen
+          name="ManageCourses"
+          component={ManageCourses} // Manage Courses screen for teachers
+          options={{
+            title: "Manage Courses", // Set the header title for this screen
+          }}
+        />
 
         {/* Assignments Screen */}
         <Stack.Screen name="Assignments" component={Assignments} />

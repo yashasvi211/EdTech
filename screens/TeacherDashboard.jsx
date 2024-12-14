@@ -146,30 +146,30 @@ export default function TeacherDashboard({ navigation }) {
               style={styles.managementBox}
               onPress={() => navigation.navigate("ManageStudents")}
             >
-              Manage Students
+              Students
             </Button>
             <Button
               mode="contained"
               style={styles.managementBox}
               onPress={() => navigation.navigate("ManageCourses")}
             >
-              Manage Courses
+              Courses
             </Button>
           </View>
           <View style={styles.row}>
             <Button
               mode="contained"
               style={styles.managementBox}
-              onPress={() => navigation.navigate("ManageAssignments")}
+              onPress={() => navigation.navigate("Assignments")}
             >
-              Manage Assignments
+              Assignments
             </Button>
             <Button
               mode="contained"
               style={styles.managementBox}
-              onPress={() => navigation.navigate("ManageTasks")}
+              onPress={() => navigation.navigate("Tasks")}
             >
-              Manage Tasks
+              Tasks
             </Button>
           </View>
         </View>

@@ -1,3 +1,5 @@
+// Assignments.js (React Native)
+
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -15,24 +17,7 @@ import axios from "axios";
 import { Ionicons } from "react-native-vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const loadSession = async () => {
-  try {
-    const sessionData = await AsyncStorage.getItem("userSession");
-    console.log("Retrieved session data:", sessionData); // Debug log
-    if (sessionData) {
-      const parsedData = JSON.parse(sessionData);
-      setUser(parsedData); // Set user data if found
-      await AsyncStorage.setItem("studentId", JSON.stringify(parsedData.id)); // Save studentId
-    } else {
-      navigation.navigate("SignIn"); // Navigate to SignIn if no session
-    }
-  } catch (error) {
-    console.error("Error loading session:", error); // Log error
-    Alert.alert("Error", "Failed to load session data.");
-  }
-};
-
-export default function Assignments({ route }) {
+const Assignments = ({ route }) => {
   const { courseId } = route.params;
   const [assignments, setAssignments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,17 +26,17 @@ export default function Assignments({ route }) {
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [submissionLink, setSubmissionLink] = useState("");
 
-  // Function to open the PDF link
+  // Function to open PDF link
   const openPdfLink = (pdfLink) => {
     Linking.openURL(pdfLink).catch((err) =>
       console.error("Failed to open PDF link:", err)
     );
   };
 
+  // Load student session and assignments
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch student ID from AsyncStorage
         const storedStudentId = await AsyncStorage.getItem("studentId");
         if (storedStudentId) {
           const parsedStudentId = JSON.parse(storedStudentId);
@@ -81,6 +66,7 @@ export default function Assignments({ route }) {
     fetchData();
   }, [courseId]);
 
+  // Handle assignment submission
   const submitAssignment = async () => {
     if (!submissionLink.trim()) {
       Alert.alert("Error", "Please enter a valid submission link");
@@ -97,7 +83,6 @@ export default function Assignments({ route }) {
         }
       );
 
-      // Update the assignments state to mark this specific assignment as submitted
       const updatedAssignments = assignments.map((assignment) =>
         assignment.id === selectedAssignment.id
           ? { ...assignment, submitted: true }
@@ -106,17 +91,17 @@ export default function Assignments({ route }) {
 
       setAssignments(updatedAssignments);
 
-      Alert.alert("Success", "Assignment submitted successfully");
+      Alert.alert("Success", response.data.message); // Use the response message here
       setSelectedAssignment(null);
       setSubmissionLink("");
     } catch (error) {
       console.error("Error submitting assignment:", error);
-      Alert.alert(
-        "Submission Error",
-        error.response?.data || "Failed to submit assignment"
-      );
+      const errorMessage =
+        error.response?.data?.message || "Failed to submit assignment";
+      Alert.alert("Submission Error", errorMessage); // Show a user-friendly error message
     }
   };
+
   const renderSubmissionModal = () => (
     <Modal
       visible={!!selectedAssignment}
@@ -219,34 +204,48 @@ export default function Assignments({ route }) {
           keyExtractor={(item) => item.id.toString()}
         />
       ) : (
-        <Text style={styles.noAssignmentsText}>No assignments found</Text>
+        <Text style={styles.noAssignmentsText}>No assignments available</Text>
       )}
 
       {renderSubmissionModal()}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
+  // Your styles here
   container: {
     flex: 1,
-    padding: 20,
+    padding: 16,
+    backgroundColor: "#fff",
   },
   centeredContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
+  errorText: {
+    color: "red",
+    fontSize: 16,
+  },
   screenTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 16,
+  },
+  noAssignmentsText: {
+    fontSize: 16,
+    color: "gray",
   },
   assignmentCard: {
-    marginBottom: 15,
-    padding: 15,
-    backgroundColor: "#f4f4f9",
-    borderRadius: 10,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
   },
   assignmentHeader: {
     flexDirection: "row",
@@ -262,95 +261,82 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   pdfButtonText: {
-    marginLeft: 5,
     color: "#007bff",
+    marginLeft: 8,
   },
   assignmentDescription: {
-    marginTop: 10,
-    color: "#666",
+    marginVertical: 8,
+    color: "gray",
   },
   assignmentFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 15,
   },
   assignmentDate: {
-    color: "#666",
-  },
-  submitAssignmentButton: {
-    backgroundColor: "#4CAF50",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
-  },
-  submitAssignmentButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    width: "90%",
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 20,
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  linkInput: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 15,
-  },
-  modalButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  cancelButton: {
-    backgroundColor: "#f44336",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-  },
-  cancelButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  submitButton: {
-    backgroundColor: "#4CAF50",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-  },
-  submitButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  errorText: {
-    color: "red",
+    color: "gray",
   },
   submittedText: {
     color: "green",
     fontWeight: "bold",
   },
-
-  noAssignmentsText: {
-    textAlign: "center",
+  submitAssignmentButton: {
+    backgroundColor: "#007bff",
+    padding: 8,
+    borderRadius: 4,
+  },
+  submitAssignmentButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  linkInput: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#007bff",
+    padding: 8,
+    marginBottom: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 8,
+    width: 300,
+  },
+  modalTitle: {
     fontSize: 18,
-    color: "#666",
+    fontWeight: "bold",
+    marginBottom: 12,
+  },
+  modalButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  cancelButton: {
+    backgroundColor: "gray",
+    padding: 10,
+    borderRadius: 4,
+    flex: 1,
+    marginRight: 8,
+  },
+  cancelButtonText: {
+    color: "#fff",
+    textAlign: "center",
+  },
+  submitButton: {
+    backgroundColor: "#007bff",
+    padding: 10,
+    borderRadius: 4,
+    flex: 1,
+  },
+  submitButtonText: {
+    color: "#fff",
+    textAlign: "center",
   },
 });
+
+export default Assignments;
