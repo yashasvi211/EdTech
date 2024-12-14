@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  ActivityIndicator, // To show loading spinner
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -14,8 +15,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
 
   const handleLogin = async () => {
+    setLoading(true); // Set loading to true when login starts
     try {
       const response = await axios.post(
         "https://edtech-server-3dnc.onrender.com/login",
@@ -38,6 +41,8 @@ export default function Login({ navigation }) {
       }
     } catch (error) {
       Alert.alert("Error", error.response?.data || "Invalid login credentials");
+    } finally {
+      setLoading(false); // Set loading to false when the request is finished
     }
   };
 
@@ -61,7 +66,19 @@ export default function Login({ navigation }) {
         style={styles.input}
         secureTextEntry
       />
-      <Button title="Login" onPress={handleLogin} color="#4CAF50" />
+
+      {/* Conditionally render the login button or a loading spinner */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#4CAF50" />
+      ) : (
+        <Button
+          title="Login"
+          onPress={handleLogin}
+          color="#4CAF50"
+          disabled={loading}
+        />
+      )}
+
       <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
         <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
       </TouchableOpacity>

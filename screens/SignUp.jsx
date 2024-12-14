@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  ActivityIndicator, // Import ActivityIndicator for loading spinner
 } from "react-native";
 import axios from "axios";
 
@@ -15,8 +16,10 @@ export default function SignUp({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student"); // Default role
+  const [loading, setLoading] = useState(false); // State to track loading
 
   const handleSignUp = async () => {
+    setLoading(true); // Set loading to true when sign-up starts
     try {
       const response = await axios.post(
         "https://edtech-server-3dnc.onrender.com/signup",
@@ -36,6 +39,8 @@ export default function SignUp({ navigation }) {
         console.error("Error in signup: ", error); // Log full error for debugging
         Alert.alert("Error", error.response?.data || "Something went wrong");
       }
+    } finally {
+      setLoading(false); // Set loading to false once the request is finished
     }
   };
 
@@ -76,7 +81,19 @@ export default function SignUp({ navigation }) {
           <Text style={styles.roleText}>Teacher</Text>
         </TouchableOpacity>
       </View>
-      <Button title="Sign Up" onPress={handleSignUp} color="#4CAF50" />
+
+      {/* Conditionally render button or loading spinner */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#4CAF50" />
+      ) : (
+        <Button
+          title="Sign Up"
+          onPress={handleSignUp}
+          color="#4CAF50"
+          disabled={loading}
+        />
+      )}
+
       <TouchableOpacity onPress={() => navigation.navigate("Login")}>
         <Text style={styles.linkText}>Already have an account? Login</Text>
       </TouchableOpacity>

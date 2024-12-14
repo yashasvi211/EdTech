@@ -1,5 +1,3 @@
- 
-
 ## **Project Overview**
 
 The EdTech platform is a React Native application designed to enhance the interaction between students and teachers, providing an efficient, user-friendly interface for managing courses, assignments, and submissions.
@@ -34,18 +32,21 @@ The EdTech platform is a React Native application designed to enhance the intera
 
 1. **Clone the Repository**:  
    Clone the project repository to your local system using the command:
+
    ```bash
    git clone https://github.com/yashasvi211/EdTech.git
    ```
 
 2. **Install Dependencies**:  
    Navigate to the project directory and run:
+
    ```bash
    npm install
    ```
 
 3. **Start the Project**:  
    Launch the project using Expo by running:
+
    ```bash
    npx expo start
    ```
@@ -53,19 +54,21 @@ The EdTech platform is a React Native application designed to enhance the intera
 4. **Download Expo Go**:  
    Install the **Expo Go** app on your mobile device. Scan the QR code displayed in the terminal to open the application on your device.
 
-5. **Login Credentials**:  
+5. **Login Credentials**:
+
    - **Student Dashboard**:  
      Email: `student`  
-     Password: `student`  
+     Password: `student`
    - **Teacher Dashboard**:  
      Email: `teacher`  
      Password: `teacher`
 
 6. **Server Access**:  
    The server is already hosted online at:  
-   [https://edtech-server-3dnc.onrender.com](https://edtech-server-3dnc.onrender.com)  
+   [https://edtech-server-3dnc.onrender.com](https://edtech-server-3dnc.onrender.com)
 
    For those who want to explore or modify the backend:
+
    - The server code and MySQL setup are available in the `backend` directory.
    - Add your MySQL credentials in the appropriate configuration files to set up a local server.
 
@@ -96,6 +99,4 @@ The project includes an **ER Diagram** (Entity-Relationship Diagram) outlining t
 
 ![ER Diagram_page-0001](https://github.com/user-attachments/assets/5d49b234-6640-4421-985a-a72fec7a328f)
 
- 
-
---- 
+---

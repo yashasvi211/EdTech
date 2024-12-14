@@ -188,9 +188,9 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   title: {
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: "bold",
-    textAlign: "center",
+    textAlign: "left",
     marginBottom: 20,
   },
   subtitle: {
