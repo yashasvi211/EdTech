@@ -43,6 +43,9 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* App Name - EdTech */}
+      <Text style={styles.appName}>EdTech</Text>
+
       <Text style={styles.title}>Login</Text>
       <TextInput
         placeholder="Email"
@@ -72,6 +75,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
     backgroundColor: "#f4f4f9",
+  },
+  appName: {
+    fontSize: 40,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#4CAF50",
+    marginBottom: 30, // To create some space between app name and login form
   },
   title: {
     fontSize: 32,
