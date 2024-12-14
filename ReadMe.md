@@ -25,7 +25,7 @@ The EdTech platform is a react-native application designed to enhance the intera
 - **Backend**: Node.js, Express
 - **Database**: MySQL (hosted on Aivel)
 - **Deployment**: Render
-[![My Skills](https://skillicons.dev/icons?i=js,react,nodejs,express,mysql)](https://skillicons.dev)
+- [![My Skills](https://skillicons.dev/icons?i=js,react,nodejs,express,mysql)](https://skillicons.dev)
 
 ## Installation Guide
 
@@ -61,7 +61,8 @@ The EdTech platform is a react-native application designed to enhance the intera
      Password: `teacher`
 
 6. **Server Access**:  
-   The server is already hosted online at:  
+   The server is already hosted online at:
+
    [https://edtech-server-3dnc.onrender.com](https://edtech-server-3dnc.onrender.com)  
 
    For those who want to explore or modify the backend:
@@ -130,14 +131,8 @@ The project includes an **ER Diagram** (Entity-Relationship Diagram) outlining t
 - **Assignments**
 - **Submissions**
 - **Courses**
-[ER Diagram.pdf](https://github.com/user-attachments/files/18136480/ER.Diagram.pdf)
-
-## Application Screenshot:
-### 1. **Sign-In Screen**
-![Screenshot_20241214-205214](https://github.com/user-attachments/assets/da5d7140-7fff-445f-a06e-925e2456e59c)
-
-### 2. **Sign-Up Screen**
-![Screenshot_20241214-205217](https://github.com/user-attachments/assets/52178458-a4c1-4ecc-a444-aecd8cc0fa2d)
+- **Download**[ER Diagram.pdf](https://github.com/user-attachments/files/18136480/ER.Diagram.pdf)
+ 
 
  
 
