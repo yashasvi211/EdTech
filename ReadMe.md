@@ -71,6 +71,9 @@ The EdTech platform is a React Native application designed to enhance the intera
 
    - The server code and MySQL setup are available in the `backend` directory.
    - Add your MySQL credentials in the appropriate configuration files to set up a local server.
+## **Application Demo**:
+
+https://drive.google.com/file/d/1gRJ13mwM_r3ptZfF5g-Cqb2Fbvq1dtbG/view
 
 ## **Files Requiring Server Integration**
 
