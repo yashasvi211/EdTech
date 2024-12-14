@@ -5,11 +5,15 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
+  TouchableOpacity,
+  Modal,
 } from "react-native";
 
 export default function ManageStudents() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [studentAssignments, setStudentAssignments] = useState(null);
 
   useEffect(() => {
     // Fetch student data from the API
@@ -27,6 +31,60 @@ export default function ManageStudents() {
 
     fetchStudents();
   }, []);
+
+  const fetchStudentAssignments = async (studentId) => {
+    try {
+      const response = await fetch(
+        `http://192.168.29.144:3000/student-assignments/${studentId}`
+      );
+      const data = await response.json();
+      setStudentAssignments(data);
+    } catch (error) {
+      console.error("Error fetching student assignments:", error);
+      setStudentAssignments(null);
+    }
+  };
+
+  const handleStudentPress = (student) => {
+    setSelectedStudent(student);
+    fetchStudentAssignments(student.id);
+  };
+
+  const renderStudentAssignmentModal = () => {
+    if (!selectedStudent || !studentAssignments) return null;
+
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={!!selectedStudent}
+        onRequestClose={() => setSelectedStudent(null)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              {selectedStudent.name}'s Assignments
+            </Text>
+            <Text style={styles.assignmentSummary}>
+              Total Assignments: {studentAssignments.totalAssignments}
+            </Text>
+            <Text style={styles.assignmentSummary}>
+              Submitted Assignments: {studentAssignments.submittedAssignments}
+            </Text>
+            <Text style={styles.assignmentSummary}>
+              Pending Assignments: {studentAssignments.pendingAssignments}
+            </Text>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setSelectedStudent(null)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
 
   if (loading) {
     return (
@@ -46,12 +104,16 @@ export default function ManageStudents() {
           data={students}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View style={styles.studentItem}>
+            <TouchableOpacity
+              style={styles.studentItem}
+              onPress={() => handleStudentPress(item)}
+            >
               <Text style={styles.studentName}>{item.name}</Text>
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}
+      {renderStudentAssignmentModal()}
     </View>
   );
 }
@@ -87,5 +149,37 @@ const styles = StyleSheet.create({
   studentName: {
     fontSize: 18,
     fontWeight: "500",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+  assignmentSummary: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  closeButton: {
+    marginTop: 15,
+    backgroundColor: "#6200ee",
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });

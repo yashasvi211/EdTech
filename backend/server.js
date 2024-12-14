@@ -7,8 +7,13 @@ const app = express();
 app.use(cors()); // Enable CORS for all origins
 app.use(express.json()); // Middleware for parsing JSON requests
 
-// Connect to MySQL
-const db = mysql.createConnection({});
+const db = mysql.createConnection({
+  host: "ed-tech-anuj211358-a952.i.aivencloud.com",
+  user: "avnadmin",
+  password: "AVNS_0vdtStG_pI8P_SCLS23",
+  database: "defaultdb",
+  port: 22278,
+});
 
 db.connect((err) => {
   if (err) {
@@ -169,16 +174,7 @@ app.put("/courses/:courseId", (req, res) => {
     }
   );
 });
-app.get("/assignments/:courseId", (req, res) => {
-  const courseId = req.params.courseId;
-  const query = "SELECT * FROM assignments WHERE course_id = ?";
-  db.query(query, [courseId], (err, results) => {
-    if (err) {
-      return res.status(500).send("Error fetching assignments");
-    }
-    res.json(results);
-  });
-});
+
 app.post("/submit-assignment", (req, res) => {
   const { assignment_id, student_id, file_link } = req.body;
 
@@ -244,8 +240,133 @@ app.post("/courses", (req, res) => {
       .json({ message: "Course added successfully", id: results.insertId });
   });
 });
+// Fetch Students Route
+app.get("/students", (req, res) => {
+  db.query("SELECT * FROM Users WHERE role = 'student'", (err, results) => {
+    if (err) {
+      console.error("Error fetching students:", err);
+      return res.status(500).send("Error fetching students");
+    }
+    res.json(results);
+  });
+});
+app.get("/assignmentsMain/:courseId", (req, res) => {
+  const { courseId } = req.params;
+  const studentId = req.query.studentId; // Add student ID as a query parameter
 
-// Server home route to explain endpoints
+  const query = `
+    SELECT a.*, 
+    CASE WHEN s.id IS NOT NULL THEN 1 ELSE 0 END AS submitted
+    FROM assignments a
+    LEFT JOIN assignment_submissions s ON a.id = s.assignment_id AND s.student_id = ?
+    WHERE a.course_id = ?
+  `;
+
+  db.query(query, [studentId, courseId], (err, results) => {
+    if (err) {
+      return res.status(500).send("Error fetching assignments");
+    }
+    res.json(results);
+  });
+});
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////*****Assignment Addition */
+// Fetch Assignments Route
+app.get("/assignments", (req, res) => {
+  const query = `
+    SELECT 
+      a.id AS assignment_id,
+      a.title,
+      a.description,
+      a.pdf_link,
+      a.created_at,
+      c.name AS course_name
+    FROM assignments a
+    JOIN courses c ON a.course_id = c.id
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching assignments:", err);
+      return res.status(500).json({ message: "Error fetching assignments" });
+    }
+    res.json(results);
+  });
+});
+
+// Add Assignment Route
+app.post("/assignments", (req, res) => {
+  const { title, description, pdf_link, course_id } = req.body;
+
+  if (!title || !description || !pdf_link || !course_id) {
+    return res.status(400).send("All fields are required");
+  }
+
+  const sql =
+    "INSERT INTO assignments (course_id, title, description, pdf_link, created_at) VALUES (?, ?, ?, ?, NOW())";
+
+  db.query(sql, [course_id, title, description, pdf_link], (err, results) => {
+    if (err) {
+      console.error("Error adding assignment:", err);
+      return res.status(500).json({ message: "Error adding assignment" });
+    }
+
+    res.status(201).json({ message: "Assignment added successfully" });
+  });
+});
+////////////////////////////////////////////////////////////////student data
+// Express route handler
+app.get("/student-assignments/:studentId", async (req, res) => {
+  const studentId = req.params.studentId;
+
+  try {
+    // More detailed query to get assignment details
+    const query = `
+      SELECT 
+        (SELECT COUNT(*) FROM assignments) AS totalAssignments,
+        (
+          SELECT COUNT(DISTINCT a.id) 
+          FROM assignments a
+          JOIN assignment_submissions ass ON a.id = ass.assignment_id
+          WHERE ass.student_id = ?
+        ) AS submittedAssignments,
+        (
+          SELECT COUNT(*) 
+          FROM assignments a
+          LEFT JOIN assignment_submissions ass ON a.id = ass.assignment_id AND ass.student_id = ?
+          WHERE ass.id IS NULL
+        ) AS pendingAssignments,
+        (
+          SELECT JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'assignment_id', a.id, 
+              'title', a.title, 
+              'course_name', c.name,
+              'submitted', CASE WHEN ass.id IS NOT NULL THEN 1 ELSE 0 END
+            )
+          )
+          FROM assignments a
+          LEFT JOIN courses c ON a.course_id = c.id
+          LEFT JOIN assignment_submissions ass ON a.id = ass.assignment_id AND ass.student_id = ?
+        ) AS assignmentDetails
+    `;
+
+    // Execute the query
+    const [results] = await pool.execute(query, [
+      studentId,
+      studentId,
+      studentId,
+    ]);
+
+    res.json(results[0]);
+  } catch (error) {
+    console.error("Error fetching student assignments:", error);
+    res.status(500).json({
+      error: "Failed to fetch student assignments",
+      details: error.message,
+    });
+  }
+});
 app.get("/", (req, res) => {
   res.send(
     "<h1>Welcome to the Auth Server</h1><p>Use <b>/signup</b> to create an account, <b>/login</b> to log in, and <b>/tasks/:userId</b> to view tasks for a user.</p>"

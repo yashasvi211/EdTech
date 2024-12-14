@@ -5,6 +5,7 @@ import {
   Button as PaperButton,
   Card,
 } from "react-native-paper";
+import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 
 export default function ManageCourses() {
   const [courses, setCourses] = useState([]);
@@ -76,64 +77,73 @@ export default function ManageCourses() {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Manage Courses</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>Manage Courses</Text>
 
-      {isAddingCourse ? (
-        <View style={styles.formContainer}>
-          <PaperInput
-            label="Course Name"
-            value={name}
-            onChangeText={setName}
-            style={styles.input}
+        {isAddingCourse ? (
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <View style={styles.formContainer}>
+              <PaperInput
+                label="Course Name"
+                value={name}
+                onChangeText={setName}
+                style={styles.input}
+              />
+              <PaperInput
+                label="Description"
+                value={description}
+                onChangeText={setDescription}
+                style={styles.input}
+              />
+              <PaperInput
+                label="Syllabus URL"
+                value={syllabus}
+                onChangeText={setSyllabus}
+                style={styles.input}
+              />
+              <View style={styles.buttonContainer}>
+                <PaperButton mode="contained" onPress={handleAddCourse}>
+                  Add Course
+                </PaperButton>
+                <PaperButton
+                  mode="outlined"
+                  onPress={() => setIsAddingCourse(false)}
+                >
+                  Cancel
+                </PaperButton>
+              </View>
+            </View>
+          </ScrollView>
+        ) : (
+          <FlatList
+            nestedScrollEnabled
+            data={courses}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderCourseItem}
           />
-          <PaperInput
-            label="Description"
-            value={description}
-            onChangeText={setDescription}
-            style={styles.input}
-          />
-          <PaperInput
-            label="Syllabus URL"
-            value={syllabus}
-            onChangeText={setSyllabus}
-            style={styles.input}
-          />
-          <View style={styles.buttonContainer}>
-            <PaperButton mode="contained" onPress={handleAddCourse}>
-              Add Course
-            </PaperButton>
-            <PaperButton
-              mode="outlined"
-              onPress={() => setIsAddingCourse(false)}
-            >
-              Cancel
-            </PaperButton>
-          </View>
-        </View>
-      ) : (
-        <FlatList
-          data={courses}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderCourseItem}
-        />
-      )}
+        )}
 
-      {!isAddingCourse && (
-        <PaperButton
-          mode="contained"
-          onPress={() => setIsAddingCourse(true)}
-          style={styles.addButton}
-        >
-          Add New Course
-        </PaperButton>
-      )}
-    </View>
+        {!isAddingCourse && (
+          <PaperButton
+            mode="contained"
+            onPress={() => setIsAddingCourse(true)}
+            style={styles.addButton}
+          >
+            Add New Course
+          </PaperButton>
+        )}
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1, // Ensures the container fills the screen
     padding: 20,
   },
   title: {

@@ -15,6 +15,7 @@ import Tasks from "./screens/Tasks";
 import Assignments from "./screens/Assignments";
 import ManageStudents from "./screens/ManageStudents"; // Import the ManageStudents screen
 import ManageCourses from "./screens/ManageCourses"; // Import the ManageCourses screen
+import ManageAssignments from "./screens/ManageAssignment";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -144,7 +145,16 @@ export default function App() {
             title: "Manage Courses", // Set the header title for this screen
           }}
         />
-
+        <Tab.Screen
+          name="ManageAssignments"
+          component={ManageAssignments}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="document" color={color} size={size} />
+            ),
+            title: "Assignments", // Tab title
+          }}
+        />
         {/* Assignments Screen */}
         <Stack.Screen name="Assignments" component={Assignments} />
       </Stack.Navigator>

@@ -44,7 +44,7 @@ const Assignments = ({ route }) => {
 
           setIsLoading(true);
           const response = await axios.get(
-            `http://192.168.29.144:3000/assignments/${courseId}`,
+            `http://192.168.29.144:3000/assignmentsMain/${courseId}`,
             {
               params: { studentId: parsedStudentId },
             }
