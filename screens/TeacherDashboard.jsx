@@ -42,13 +42,17 @@ export default function TeacherDashboard({ navigation }) {
           (record) => record.submitted_at !== null
         ).length;
         const totalSubmissionsExpected = data.length;
+        const notSubmittedCount = totalSubmissionsExpected - submittedCount;
 
+        // Ensure we always have a valid number
         setSubmissionData({
-          submitted: submittedCount,
-          notSubmitted: totalSubmissionsExpected - submittedCount,
+          submitted: submittedCount || 0,
+          notSubmitted: notSubmittedCount || 0,
         });
       } catch (error) {
         console.error("Error fetching submission data:", error);
+        // Fallback to 0 if there's an error
+        setSubmissionData({ submitted: 0, notSubmitted: 0 });
       }
     };
 
@@ -87,6 +91,24 @@ export default function TeacherDashboard({ navigation }) {
     );
   }
 
+  // Prepare chart data, ensuring we only show non-zero values
+  const chartData = [
+    {
+      name: "Submitted",
+      population: submissionData.submitted,
+      color: "#2ecc71",
+      legendFontColor: "#000",
+      legendFontSize: 13,
+    },
+    {
+      name: "Not Submitted",
+      population: submissionData.notSubmitted,
+      color: "#e74c3c",
+      legendFontColor: "#000",
+      legendFontSize: 13,
+    },
+  ].filter((item) => item.population > 0);
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -99,30 +121,20 @@ export default function TeacherDashboard({ navigation }) {
         {/* Submission Status Chart */}
         <View style={styles.chartContainer}>
           <Text style={styles.chartTitle}>Submission Status</Text>
-          <PieChart
-            data={[
-              {
-                name: "Submitted",
-                population: submissionData.submitted,
-                color: "green",
-                legendFontColor: "#7F7F7F",
-                legendFontSize: 15,
-              },
-              {
-                name: "Not Submitted",
-                population: submissionData.notSubmitted,
-                color: "red",
-                legendFontColor: "#7F7F7F",
-                legendFontSize: 15,
-              },
-            ]}
-            width={screenWidth - 40}
-            height={200}
-            chartConfig={chartConfig}
-            accessor={"population"}
-            backgroundColor={"transparent"}
-            paddingLeft={"15"}
-          />
+          {chartData.length > 0 ? (
+            <PieChart
+              data={chartData}
+              width={screenWidth - 40}
+              height={200}
+              chartConfig={chartConfig}
+              accessor={"population"}
+              backgroundColor={"transparent"}
+              paddingLeft={"15"}
+              absolute
+            />
+          ) : (
+            <Text style={styles.noDataText}>No submission data available</Text>
+          )}
         </View>
 
         {/* Management Options */}
@@ -151,6 +163,13 @@ export default function TeacherDashboard({ navigation }) {
               onPress={() => navigation.navigate("ManageAssignments")}
             >
               Manage Assignments
+            </Button>
+            <Button
+              mode="contained"
+              style={styles.managementBox}
+              onPress={() => navigation.navigate("ManageTasks")}
+            >
+              Manage Tasks
             </Button>
           </View>
         </View>
@@ -194,6 +213,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "center",
     fontWeight: "bold",
+  },
+  noDataText: {
+    textAlign: "center",
+    color: "#666",
+    fontSize: 15,
   },
   managementContainer: {
     marginBottom: 20,
