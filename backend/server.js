@@ -8,7 +8,9 @@ app.use(cors());
 app.use(express.json());
 
 // Create a connection pool instead of a single connection
-const pool = mysql.createPool({});
+const pool = mysql.createPool({
+  //your mysql cred
+});
 
 // Keep your existing db connection for non-promise queries if needed
 const db = require("mysql2").createConnection({});
