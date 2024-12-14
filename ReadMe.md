@@ -93,6 +93,7 @@ The project includes an **ER Diagram** (Entity-Relationship Diagram) outlining t
 - **Submissions**
 - **Courses**
 - [Download ER Diagram.pdf](https://github.com/user-attachments/files/18136480/ER.Diagram.pdf)
+
 ![ER Diagram_page-0001](https://github.com/user-attachments/assets/5d49b234-6640-4421-985a-a72fec7a328f)
 
  
